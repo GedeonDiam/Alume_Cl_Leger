@@ -32,9 +32,10 @@
                 <td><input type="email" name="email" class="form-input" required value="<?= ($leClient==null)?' ':$leClient['email']?>"></td>
             </tr>
 
-            <tr>
+            <tr  style="display: none;">
+                
                 <td>Mot de passe : </td>
-                <td> <input type="password" name="mdp" class="form-input" required></td>
+                <td> <input type="password" name="mdp" class="form-input"></td>
             </tr>
 
             <tr>    

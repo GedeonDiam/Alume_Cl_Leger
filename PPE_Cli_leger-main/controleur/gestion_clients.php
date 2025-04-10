@@ -32,9 +32,13 @@ if (isset($_POST["Valider"])){
 if (isset($_POST["Modifier"])){
 	// Mise à jour des données dans la base
 	$unControleur->updateClient($_POST);
-	// Redirection après modification pour actualiser la page
-	header("Location: index.php?page=2");
-	exit();  // Toujours faire un exit après une redirection
+	// Afficher un message de succès et rediriger après un délai
+	echo "<div id='message' style='color: green; font-weight: bold; padding: 10px; background-color: #f0fff0; border: 1px solid green; border-radius: 5px; margin: 10px 0;'>✅ Modification réussie ! Redirection dans 3 secondes...</div>";
+	echo "<script>
+		setTimeout(function() {
+			window.location.href = 'index.php?page=2';
+		}, 2000); // Redirection après 3 secondes
+	</script>";
 }
 
 // La vue des clients n'est accessible qu'aux administrateurs

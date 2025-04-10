@@ -1,127 +1,214 @@
+<?php
+require_once("modele/modele.class.php");
+require_once("controleur/controleur.class.php");
+$unControleur = new Controleur();
+
+// Récupération des catégories distinctes
+$categories = $unControleur->selectDistinctCategories();
+
+// Organisation des catégories par paires pour l'affichage
+$categoriesPairs = array_chunk($categories, 2);
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nos Services - Matériaux de Construction</title>
+    <title>Nos Catégories - ALUME</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #080808 0%, #333333 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 40px;
+            position: relative;
+            border-bottom: 3px solid #FFFD55;
+        }
+        
+        .hero-section h1 {
+            font-weight: 700;
+            color: #FFFD55;
+            margin-bottom: 15px;
+        }
+        
+        .category-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .category-header {
+            background: linear-gradient(45deg, #080808, #333333);
+            color: #FFFD55;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .list-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s ease;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-item:hover {
+            background-color: #f8f9fa;
+            padding-left: 25px;
+        }
+        
+        .list-icon {
+            color: #FFFD55;
+            background-color: #080808;
+            padding: 7px;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .view-all {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #080808;
+            color: #FFFD55;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .view-all:hover {
+            background-color: #FFFD55;
+            color: #080808;
+        }
+        
+        .contact-section {
+            background: linear-gradient(135deg, #080808 0%, #333333 100%);
+            border-radius: 15px;
+            padding: 50px 0;
+            margin-top: 50px;
+        }
+        
+        .btn-contact {
+            background-color: #FFFD55;
+            color: #080808;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-contact:hover {
+            background-color: #fff;
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
     <!-- En-tête -->
-    <div class="py-5 position-relative" style="background: linear-gradient(135deg, #1a1a1a 0%, #363636 100%);">
+    <div class="hero-section">
         <div class="container py-5">
             <div class="text-center">
-                <h1 class="display-4 text-light">Nos Services</h1>
-                <p class="lead text-light mb-4">Des solutions complètes pour vos projets de construction</p>
+                <h1 class="display-4">Nos Catégories de Produits</h1>
+                <p class="lead mb-0">Découvrez notre large gamme de solutions pour tous vos projets</p>
             </div>
         </div>
     </div>
 
-    <main class="container my-5">
-        <section class="services-section py-5">
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card h-100 shadow-sm hover-card">
-                        <div class="card-body text-center">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-home fa-3x text-danger"></i>
+    <main class="container">
+        <!-- Catégories -->
+        <section class="py-5">
+            <div class="row">
+                <?php if(count($categories) > 0): ?>
+                    <?php foreach($categories as $index => $categorie): ?>
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="category-card h-100">
+                                <div class="category-header">
+                                    <div class="category-icon">
+                                        <!-- Icônes différentes selon la catégorie -->
+                                        <?php 
+                                        $icons = ['fa-bolt', 'fa-wrench', 'fa-hammer', 'fa-paint-brush', 
+                                                'fa-faucet', 'fa-toolbox', 'fa-ruler', 'fa-plug'];
+                                        $icon = $icons[$index % count($icons)];
+                                        ?>
+                                        <i class="fas <?php echo $icon; ?>"></i>
+                                    </div>
+                                    <h3><?php echo htmlspecialchars($categorie['categorie']); ?></h3>
+                                </div>
+                                <div class="card-body">
+                                    <?php 
+                                    // Récupération des produits par catégorie (limité à 4 produits)
+                                    $produits = $unControleur->selectProduitsByCategorie($categorie['categorie']);
+                                    $produitsAffiches = array_slice($produits, 0, 4);
+                                    
+                                    foreach($produitsAffiches as $produit): 
+                                    ?>
+                                        <div class="list-item">
+                                            <span class="list-icon">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                            <?php echo htmlspecialchars($produit['nomproduit']); ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                    
+                                    <!-- Si la catégorie contient plus de produits que ceux affichés -->
+                                    <?php if(count($produits) > count($produitsAffiches)): ?>
+                                        <div class="list-item text-muted">
+                                            <em>Et <?php echo count($produits) - count($produitsAffiches); ?> autres produits...</em>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <a href="index.php?page=produit&categorie=<?php echo urlencode($categorie['categorie']); ?>" class="view-all mt-3">
+                                        Voir tous les produits
+                                    </a>
+                                </div>
                             </div>
-                            <h5 class="card-title">Toiture et Couverture</h5>
-                            <ul class="list-unstyled text-start">
-                                <li class="border-bottom py-2">Tuiles et ardoises</li>
-                                <li class="border-bottom py-2">Gouttières</li>
-                                <li class="border-bottom py-2">Isolation toiture</li>
-                                <li class="py-2">Membranes d'étanchéité</li>
-                            </ul>
                         </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-12 text-center">
+                        <p>Aucune catégorie disponible pour le moment.</p>
                     </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="card h-100 shadow-sm hover-card">
-                        <div class="card-body text-center">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-faucet fa-3x text-success"></i>
-                            </div>
-                            <h5 class="card-title">Plomberie & Sanitaire</h5>
-                            <ul class="list-unstyled text-start">
-                                <li class="border-bottom py-2">Tuyauterie et raccords</li>
-                                <li class="border-bottom py-2">Robinetterie</li>
-                                <li class="border-bottom py-2">Évacuation</li>
-                                <li class="py-2">Équipements sanitaires</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                    <div class="card h-100 shadow-sm hover-card">
-                        <div class="card-body text-center">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-plug fa-3x text-warning"></i>
-                            </div>
-                            <h5 class="card-title">Électricité</h5>
-                            <ul class="list-unstyled text-start">
-                                <li class="border-bottom py-2">Câbles et gaines</li>
-                                <li class="border-bottom py-2">Tableaux électriques</li>
-                                <li class="border-bottom py-2">Prises et interrupteurs</li>
-                                <li class="py-2">Éclairage technique</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
-                    <div class="card h-100 shadow-sm hover-card">
-                        <div class="card-body text-center">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-paint-roller fa-3x text-primary"></i>
-                            </div>
-                            <h5 class="card-title">Peinture & Décoration</h5>
-                            <ul class="list-unstyled text-start">
-                                <li class="border-bottom py-2">Peintures intérieures</li>
-                                <li class="border-bottom py-2">Revêtements muraux</li>
-                                <li class="border-bottom py-2">Outillage peinture</li>
-                                <li class="py-2">Enduits décoratifs</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
         </section>
 
-        <section class="contact-section text-center py-5 mt-5" style="background: linear-gradient(135deg, #1a1a1a 0%, #363636 100%); border-radius: 15px;">
+        <!-- Section contact -->
+        <section class="contact-section text-center py-5 mt-5">
             <div class="container py-4">
-                <h2 class="text-light">Besoin d'un conseil ?</h2>
+                <h2 class="text-light mb-3">Besoin d'assistance ?</h2>
                 <p class="text-light mb-4">Nos experts sont à votre disposition pour vous guider dans votre projet</p>
-                <button class="btn btn-warning btn-lg">
+                <a href="index.php?page=contact" class="btn btn-contact btn-lg px-4 py-2">
                     <i class="fas fa-envelope me-2"></i> Contactez-nous
-                </button>
+                </a>
             </div>
         </section>
     </main>
-
-    <style>
-        .hover-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .hover-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-        }
-        .feature-icon {
-            transition: transform 0.3s ease;
-        }
-        .hover-card:hover .feature-icon {
-            transform: scale(1.1);
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-        }
-    </style>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -26,7 +26,7 @@
                 echo "<td>".$uneCommande['codedevis']."</td>";
                 echo "<td class='actions'>";
                 echo "<a href='index.php?page=6&action=sup&idcommande=".$uneCommande['idcommande']."' class='btn btn-secondary'>Supprimer</a> ";
-                echo "<a href='index.php?page=6action=edit&idcommande=".$uneCommande['idcommande']."' class='btn btn-primary'>Éditer</a>";
+                echo "<a href='index.php?page=6&action=edit&idcommande=".$uneCommande['idcommande']."' class='btn btn-primary'>Éditer</a>";
                 echo "</td>";
                 echo "</tr>";
             }

@@ -84,6 +84,43 @@
 			return $this->unModele->selectWhereProduit($idproduit);
 		}
 
+		/****************** Gestion des catégories ******/
+		public function insertCategorie($tab){
+			$this->unModele->insertCategorie($tab);
+		}
+		
+		public function selectAllCategories($filtre = ""){
+			return $this->unModele->selectAllCategories($filtre);
+		}
+		
+		public function deleteCategorie($codecat){
+			$this->unModele->deleteCategorie($codecat);
+		}
+		
+		public function updateCategorie($tab){
+			$this->unModele->updateCategorie($tab);
+		}
+		
+		public function selectWhereCategorie($codecat){
+			return $this->unModele->selectWhereCategorie($codecat);
+		}
+		
+		/****************** Gestion des produits frontend ******/
+		public function selectAllProduitsFrontend(){
+			return $this->unModele->selectAllProduitsFrontend();
+		}
+		
+		public function selectProduitsByCategorie($categorie){
+			return $this->unModele->selectProduitsByCategorie($categorie);
+		}
+		
+		public function searchProduits($keyword){
+			return $this->unModele->searchProduits($keyword);
+		}
+		
+		public function selectDistinctCategories(){
+			return $this->unModele->selectDistinctCategories();
+		}
 
 		/*******Gestion des users ******************************* */
 		public function verifConnexion($email, $mdp){
@@ -182,6 +219,43 @@
 
 		public function verifConnexionAdmin($email, $mdp){
 			return $this->unModele->verifConnexionAdmin($email, $mdp);
+		}
+
+		/****************** Gestion du panier ******/
+		public function getPanierActif($idclient){
+			return $this->unModele->getPanierActif($idclient);
+		}
+
+		public function ajouterProduitPanier($idpanier, $idproduit, $quantite = 1){
+			return $this->unModele->ajouterProduitPanier($idpanier, $idproduit, $quantite);
+		}
+
+		public function getProduitsPanier($idpanier){
+			return $this->unModele->getProduitsPanier($idpanier);
+		}
+
+		public function modifierQuantitePanier($idpanier, $idproduit, $quantite){
+			return $this->unModele->modifierQuantitePanier($idpanier, $idproduit, $quantite);
+		}
+
+		public function supprimerProduitPanier($idpanier, $idproduit){
+			return $this->unModele->supprimerProduitPanier($idpanier, $idproduit);
+		}
+
+		public function viderPanier($idpanier){
+			return $this->unModele->viderPanier($idpanier);
+		}
+
+		public function getTotalPanier($idpanier){
+			return $this->unModele->getTotalPanier($idpanier);
+		}
+
+		public function getNombreArticlesPanier($idpanier){
+			return $this->unModele->getNombreArticlesPanier($idpanier);
+		}
+
+		public function validerPanier($idpanier, $idclient){
+			return $this->unModele->validerPanier($idpanier, $idclient);
 		}
 	}
 ?>

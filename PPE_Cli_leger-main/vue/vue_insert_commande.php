@@ -1,35 +1,30 @@
 <div class="container">
-    <h3>Insertion d'une commande</h3>
-    <form method="post" action="" class="form-technicien">
+    <h3><?= ($laCommande==null) ? 'Ajout d\'une commande' : 'Modification de la commande #'.$laCommande['idcommande'] ?></h3>
+    <form method="post" class="form-commande">
         <table>
             <tr>
-                <td>État de la commande : </td>
+                <td>État de la commande :</td>
                 <td>
-                    <select class="form-input" name="etatcom" id="etatcom">
-                        <option value="" disabled selected hidden>Choisir un état</option>
-                        <option value="en attente">En attente</option>
-                        <option value="annulee">Annulée</option>
-                        <option value="livree">Livrée</option>
-                        <option value="en preparation">En préparation</option>
-                        <option value="confirmee">Confirmée</option>
+                    <select name="etatcom" class="form-select" required>
+                        <option value="" disabled <?= ($laCommande==null) ? 'selected' : '' ?> hidden>Choisir un état</option>
+                        <option value="en cours" <?= ($laCommande!=null && $laCommande['etatcom']=='en cours') ? 'selected' : '' ?>>En cours</option>
+                        <option value="terminée" <?= ($laCommande!=null && $laCommande['etatcom']=='terminée') ? 'selected' : '' ?>>Terminée</option>
+                        <option value="annulée" <?= ($laCommande!=null && $laCommande['etatcom']=='annulée') ? 'selected' : '' ?>>Annulée</option>
                     </select>
                 </td>
             </tr>
             <tr>
-                <td>Code devis : </td>
-                <td><input type="number" name="codedevis" id="codedevis" class="form-input" required></td>
+                <td>Code devis :</td>
+                <td><input type="text" name="codedevis" class="form-input" required value="<?= ($laCommande==null) ? '' : $laCommande['codedevis'] ?>"></td>
             </tr>
             <tr>
                 <td><input type="reset" name="Annuler" value="Annuler" class="btn btn-secondary"></td>
                 <td>
-                    <?php if(isset($laCommande)) { ?>
-                        <input type="hidden" name="idcommande" value="<?= $laCommande['idcommande'] ?>">
-                        <input type="submit" name="Modifier" value="Modifier" class="btn btn-primary">
-                    <?php } else { ?>
-                        <input type="submit" name="Valider" value="Valider" class="btn btn-primary">
-                    <?php } ?>
+                    <input type="submit" class="btn btn-primary" 
+                        <?= ($laCommande==null) ? 'name="Valider" value="Valider"' : 'name="Modifier" value="Modifier"' ?>>
                 </td>
             </tr>
+            <?= ($laCommande==null) ? '' : '<input type="hidden" name="idcommande" value="'.$laCommande['idcommande'].'">' ?>
         </table>
     </form>
 </div>
@@ -53,12 +48,12 @@
         text-transform: uppercase;
     }
 
-    .form-technicien table {
+    .form-commande table {
         width: 100%;
         border-spacing: 0 15px;
     }
 
-    .form-technicien td {
+    .form-commande td {
         padding: 8px;
         color: #000000;
     }

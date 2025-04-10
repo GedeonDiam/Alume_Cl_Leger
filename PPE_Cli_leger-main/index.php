@@ -13,19 +13,7 @@ if (isset($_GET['page']) && $_GET['page'] == 10) {
 }
 
 // Gérer la connexion avant tout output
-if (isset($_POST["Connexion"])) {
-    $email = $_POST["email"];
-    $mdp = $_POST["mdp"];
-    $unUser = $unControleur->verifConnexion($email, $mdp);
-    if ($unUser && is_array($unUser)) {
-        $_SESSION["nom"] = isset($unUser["nom"]) ? $unUser["nom"] : "";
-        $_SESSION["prenom"] = isset($unUser["prenom"]) ? $unUser["prenom"] : "";
-        $_SESSION["email"] = isset($unUser["email"]) ? $unUser["email"] : "";
-        $_SESSION["role"] = isset($unUser["role"]) ? strtolower($unUser["role"]) : "user"; // Normalisation du rôle en minuscules
-        header("Location: index.php?page=1");
-        exit();
-    }
-}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -169,8 +157,12 @@ if (isset($_POST["Connexion"])) {
         case 9: require_once("controleur/gestion_interventions.php"); break;
         case 10: /* Déconnexion - handled at the beginning of the file */ break;
 
-      case 'connexion':
+        case 'connexion':
             require_once("vue/vue_connexion.php");
+            break;
+
+        case 'connexion_admin':
+            require_once("vue/vue_connexion_admin.php");
             break;
 
         case 'categorie':
@@ -188,8 +180,25 @@ if (isset($_POST["Connexion"])) {
         case 'inscription_technicien':
             require_once("vue/partie_utilisateur/vue_inscription_technicien.php");
             break;
+
         case 'contact':
             require_once("vue/partie_utilisateur/contact.php");
+            break;
+
+        case 'gestion_utilisateur':
+            require_once("controleur/gestion_utilisateur.php");
+            break;
+
+        case 'gestion_admin':
+            require_once("controleur/gestion_admin.php");
+            break;
+
+        case 'panier':
+            require_once("vue/partie_utilisateur/panier.php");
+            break;
+
+        case 'commande_confirmation':
+            require_once("vue/partie_utilisateur/commande_confirmation.php");
             break;
     }
 ?>

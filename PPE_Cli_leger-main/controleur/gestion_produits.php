@@ -20,18 +20,25 @@ if (isset($_GET['action']) && isset($_GET['idproduit'])) {
     }
 }
 
+// Affichage du formulaire d'insertion/modification
+require_once("vue/vue_insert_produit.php");
+
 // Traitement du formulaire d'insertion
 if (isset($_POST["Valider"])){
     $unControleur->insertProduit($_POST);
     echo "<br> <div id='message' style='color: green;'>✔️ Insertion réussie.</div>";
-   
 }
 
 // Traitement du formulaire de modification
 if (isset($_POST["Modifier"])){
     $unControleur->updateProduit($_POST);
-    header("Location: index.php?page=4");
-    exit();
+    // Afficher un message de succès et rediriger après un délai
+    echo "<div id='message' style='color: green; font-weight: bold; padding: 10px; background-color: #f0fff0; border: 1px solid green; border-radius: 5px; margin: 10px 0;'>✅ Modification réussie ! Redirection dans 2 secondes...</div>";
+    echo "<script>
+        setTimeout(function() {
+            window.location.href = 'index.php?page=4';
+        }, 2000); // Redirection après 2 secondes
+    </script>";
 }
 
 // Récupération des produits
@@ -42,14 +49,8 @@ if(isset($_POST['Filtrer'])){
 }
 $lesProduits = $unControleur->selectAllProduits($filtre);
 
-// Affichage des vues dans le bon ordre
-if(isset($_GET['action']) && $_GET['action'] == 'edit') {
-    require_once("vue/vue_edit_produit.php");
-} else {
-    require_once("vue/vue_insert_produit.php");
-}
+// Affichage de la vue de liste des produits
 require_once("vue/vue_select_produits.php");
-
 ?>
 
 <script>
@@ -61,7 +62,6 @@ require_once("vue/vue_select_produits.php");
         }
     }, 3000); // 3 secondes
 </script>
-
 
 <style>
 .flash-message {

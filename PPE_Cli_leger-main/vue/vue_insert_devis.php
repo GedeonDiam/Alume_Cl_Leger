@@ -1,38 +1,47 @@
 <div class="container">
-    <h3>Ajout d'un nouveau devis</h3>
+    <h3><?= isset($unDevis) && $unDevis ? "Modification d'un devis" : "Ajout d'un nouveau devis" ?></h3>
     <form method="post" action="" class="form-technicien">
         <table>
             <tr>
                 <td>Date du devis :</td>
-                <td><input type="date" name="datedevis" class="form-input"  required></td>
+                <td><input type="date" name="datedevis" class="form-input" required value="<?= isset($unDevis) && $unDevis ? $unDevis['datedevis'] : date('Y-m-d') ?>"></td>
             </tr>
             <tr>
                 <td>État du devis :</td>
                 <td>
-                <select name="etatdevis" class="form-input" required>
-    <option value="" disabled selected hidden>Choisir un état</option>
-    <option value="acceptee">Acceptée</option>
-    <option value="annulee">Annulée</option>
-</select>
+                    <select name="etatdevis" class="form-input" required>
+                        <option value="" disabled <?= !isset($unDevis) || !$unDevis ? 'selected' : '' ?> hidden>Choisir un état</option>
+                        <option value="acceptee" <?= isset($unDevis) && $unDevis && $unDevis['etatdevis'] == 'acceptee' ? 'selected' : '' ?>>Acceptée</option>
+                        <option value="annulee" <?= isset($unDevis) && $unDevis && $unDevis['etatdevis'] == 'annulee' ? 'selected' : '' ?>>Annulée</option>
+                        <option value="en_attente" <?= isset($unDevis) && $unDevis && $unDevis['etatdevis'] == 'en_attente' ? 'selected' : '' ?>>En attente</option>
+                    </select>
                 </td>
             </tr>
             <tr>
                 <td>Client :</td>
                 <td>
-                <select name="idclient" class="form-input" required>
-    <option value="" disabled selected hidden>Choisir un client</option>
-    <?php
-    $lesClients = $unControleur->selectAllClients("");
-    foreach($lesClients as $unClient){
-        echo "<option value='".$unClient['idclient']."'>".$unClient['nom']."</option>";
-    }
-    ?>
-</select>
+                    <select name="idclient" class="form-input" required>
+                        <option value="" disabled <?= !isset($unDevis) || !$unDevis ? 'selected' : '' ?> hidden>Choisir un client</option>
+                        <?php
+                        $lesClients = $unControleur->selectAllClients("");
+                        foreach($lesClients as $unClient){
+                            $selected = (isset($unDevis) && $unDevis && $unDevis['idclient'] == $unClient['idclient']) ? 'selected' : '';
+                            echo "<option value='".$unClient['idclient']."' ".$selected.">".$unClient['nom']."</option>";
+                        }
+                        ?>
+                    </select>
                 </td>
             </tr>
             <tr>
                 <td><input type="reset" name="Annuler" value="Annuler" class="btn btn-secondary"></td>
-                <td><input type="submit" name="Enregistrer" value="Enregistrer" class="btn btn-primary"></td>
+                <td>
+                    <?php if(isset($unDevis) && $unDevis) { ?>
+                        <input type="submit" name="Modifier" value="Modifier" class="btn btn-primary">
+                        <input type="hidden" name="iddevis" value="<?= $unDevis['iddevis'] ?>">
+                    <?php } else { ?>
+                        <input type="submit" name="Enregistrer" value="Enregistrer" class="btn btn-primary">
+                    <?php } ?>
+                </td>
             </tr>
         </table>
     </form>

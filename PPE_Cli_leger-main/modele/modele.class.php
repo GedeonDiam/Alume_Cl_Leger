@@ -116,14 +116,15 @@ class Modele {
 		$exec->execute($donnees);
 		}
 		public function updateTechnicien($tab){
-		$requete = "update technicien set nom = :nom, prenom = :prenom, specialite = :specialite, email = :email, mdp = :mdp where idtech = :idtech;";
-		$donnees = array (':idtechnicien' => $tab['idtechnicien'],
-						':nom' => $tab['nom'],
-						':prenom' => $tab['prenom'],
-						':specialite' => $tab['specialite'],
-						':email' => $tab['email'],
-						':mdp' => $tab['mdp'],
-						);
+		$requete = "update technicien set nom = :nom, prenom = :prenom, specialite = :specialite, email = :email, mdp = :mdp where idtechnicien = :idtechnicien;";
+		$donnees = array (
+			':idtechnicien' => $tab['idtechnicien'],
+			':nom' => $tab['nom'],
+			':prenom' => $tab['prenom'],
+			':specialite' => $tab['specialite'],
+			':email' => $tab['email'],
+			':mdp' => $tab['mdp']
+		);
 		$exec = $this->unPdo->prepare($requete);
 		$exec->execute($donnees);
 		}
@@ -188,11 +189,93 @@ class Modele {
 		return $unProduit;
 	}
 
+	/**************** Gestion des catégories de produits ************/
+	public function insertCategorie($tab){
+		$requete = "insert into cat_produit values (:codecat, :nomcat);";
+		$donnees = array(
+			':codecat' => $tab['codecat'],
+			':nomcat' => $tab['nomcat']
+		); 
+		$exec = $this->unPdo->prepare($requete);
+		$exec->execute($donnees);
+	}
+	
+	public function selectAllCategories($filtre = ""){
+		if($filtre == ""){
+			$requete = "select * from cat_produit order by nomcat;";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute();
+		}else{
+			$requete = "select * from cat_produit where nomcat like :filtre;";
+			$donnees = array(":filtre"=>"%".$filtre."%");
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute($donnees);
+		}
+		return $exec->fetchAll();
+	}
+	
+	public function deleteCategorie($codecat){
+		$requete = "delete from cat_produit where codecat = :codecat;";
+		$donnees = array(':codecat' => $codecat);
+		$exec = $this->unPdo->prepare($requete);
+		$exec->execute($donnees);
+	}
+	
+	public function updateCategorie($tab){
+		$requete = "update cat_produit set nomcat = :nomcat where codecat = :codecat;";
+		$donnees = array(
+			':codecat' => $tab['codecat'],
+			':nomcat' => $tab['nomcat']
+		);
+		$exec = $this->unPdo->prepare($requete);
+		$exec->execute($donnees);
+	}
+	
+	public function selectWhereCategorie($codecat){
+		$requete = "select * from cat_produit where codecat = :codecat;";
+		$donnees = array(':codecat' => $codecat);
+		$exec = $this->unPdo->prepare($requete);
+		$exec->execute($donnees);
+		return $exec->fetch();
+	}
+	
+	/**************** Récupération des produits pour l'affichage frontend ************/
+	public function selectAllProduitsFrontend(){
+		$requete = "select * from produit order by nomproduit;";
+		$exec = $this->unPdo->prepare($requete);
+		$exec->execute();
+		return $exec->fetchAll();
+	}
+	
+	public function selectProduitsByCategorie($categorie){
+		$requete = "select * from produit where categorie = :categorie order by nomproduit;";
+		$donnees = array(':categorie' => $categorie);
+		$exec = $this->unPdo->prepare($requete);
+		$exec->execute($donnees);
+		return $exec->fetchAll();
+	}
+	
+	public function searchProduits($keyword){
+		$requete = "select * from produit where nomproduit like :keyword or categorie like :keyword;";
+		$donnees = array(':keyword' => '%'.$keyword.'%');
+		$exec = $this->unPdo->prepare($requete);
+		$exec->execute($donnees);
+		return $exec->fetchAll();
+	}
+	
+	/**************** Récupération des catégories distinctes des produits ************/
+	public function selectDistinctCategories(){
+		$requete = "select distinct categorie from produit order by categorie;";
+		$exec = $this->unPdo->prepare($requete);
+		$exec->execute();
+		return $exec->fetchAll();
+	}
 
 	/********************************Gestions des users********************************************/
 
 	public function verifConnexion($email, $mdp){
 		try {
+			// Vérification dans la table technicien
 			$requete = "select * from technicien where email =:email and mdp=:mdp;";
 			$exec = $this->unPdo->prepare($requete);
 			$donnees = array(":email"=>$email, ":mdp"=>$mdp);
@@ -202,8 +285,54 @@ class Modele {
 			if($resultat) {
 				return array(
 					"success" => true,
-					"message" => "Connexion réussie !",
-					"data" => $resultat
+					"message" => "Connexion technicien réussie !",
+					"data" => $resultat,
+					"role" => $resultat['role'] ? $resultat['role'] : 'technicien'
+				);
+			} 
+			
+			// Si pas de technicien trouvé, vérification dans la table client
+			$requete = "select * from client where email = :email and mdp = :mdp;";
+			$donnees = array(':email' => $email, ':mdp' => $mdp);
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute($donnees);
+			$resultat = $exec->fetch();
+			
+			if($resultat) {
+				return array(
+					"success" => true,
+					"message" => "Connexion client réussie !",
+					"data" => $resultat,
+					"role" => $resultat['role'] ? $resultat['role'] : 'client'
+				);
+			} else {
+				return array(
+					"success" => false,
+					"message" => "Email ou mot de passe incorrect"
+				);
+			}
+		} catch(PDOException $e) {
+			return array(
+				"success" => false,
+				"message" => "Erreur de connexion : " . $e->getMessage()
+			);
+		}
+	}
+	
+	public function verifConnexionClient($email, $mdp){
+		try {
+			$requete = "select * from client where email = :email and mdp = :mdp;";
+			$donnees = array(':email' => $email, ':mdp' => $mdp);
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute($donnees);
+			$resultat = $exec->fetch();
+			
+			if($resultat) {
+				return array(
+					"success" => true,
+					"message" => "Connexion client réussie !",
+					"data" => $resultat,
+					"role" => "client"
 				);
 			} else {
 				return array(
@@ -469,5 +598,237 @@ class Modele {
         unset($_SESSION);
         return true;
     }
+
+	/********************************Gestions des paniers********************************************/
+	public function getPanierActif($idclient) {
+		try {
+			// Vérifier si le client a déjà un panier actif
+			$requete = "SELECT * FROM panier WHERE idclient = :idclient AND statut = 'actif'";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idclient' => $idclient));
+			$panier = $exec->fetch();
+			
+			// Si aucun panier actif n'existe, en créer un nouveau
+			if (!$panier) {
+				$requete = "INSERT INTO panier (idclient, statut) VALUES (:idclient, 'actif')";
+				$exec = $this->unPdo->prepare($requete);
+				$exec->execute(array(':idclient' => $idclient));
+				
+				// Récupérer le panier nouvellement créé
+				$idpanier = $this->unPdo->lastInsertId();
+				$requete = "SELECT * FROM panier WHERE idpanier = :idpanier";
+				$exec = $this->unPdo->prepare($requete);
+				$exec->execute(array(':idpanier' => $idpanier));
+				$panier = $exec->fetch();
+			}
+			
+			return $panier;
+		} catch (PDOException $e) {
+			echo "Erreur lors de la récupération du panier: " . $e->getMessage();
+			return false;
+		}
+	}
+
+	public function ajouterProduitPanier($idpanier, $idproduit, $quantite = 1) {
+		try {
+			// Récupérer le prix du produit
+			$requete = "SELECT prix_unit FROM produit WHERE idproduit = :idproduit";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idproduit' => $idproduit));
+			$produit = $exec->fetch();
+			
+			if (!$produit) {
+				return array('success' => false, 'message' => 'Produit non trouvé');
+			}
+			
+			// Vérifier si le produit est déjà dans le panier
+			$requete = "SELECT * FROM panier_produit WHERE idpanier = :idpanier AND idproduit = :idproduit";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier, ':idproduit' => $idproduit));
+			$produitPanier = $exec->fetch();
+			
+			if ($produitPanier) {
+				// Mettre à jour la quantité si le produit est déjà dans le panier
+				$nouvelleQuantite = $produitPanier['quantite'] + $quantite;
+				$requete = "UPDATE panier_produit SET quantite = :quantite WHERE idpanier = :idpanier AND idproduit = :idproduit";
+				$exec = $this->unPdo->prepare($requete);
+				$exec->execute(array(
+					':quantite' => $nouvelleQuantite,
+					':idpanier' => $idpanier,
+					':idproduit' => $idproduit
+				));
+			} else {
+				// Ajouter le produit au panier
+				$requete = "INSERT INTO panier_produit (idpanier, idproduit, quantite, prixUnitaire) 
+							VALUES (:idpanier, :idproduit, :quantite, :prixUnitaire)";
+				$exec = $this->unPdo->prepare($requete);
+				$exec->execute(array(
+					':idpanier' => $idpanier,
+					':idproduit' => $idproduit,
+					':quantite' => $quantite,
+					':prixUnitaire' => $produit['prix_unit']
+				));
+			}
+			
+			return array('success' => true, 'message' => 'Produit ajouté au panier');
+		} catch (PDOException $e) {
+			return array('success' => false, 'message' => 'Erreur: ' . $e->getMessage());
+		}
+	}
+
+	public function getProduitsPanier($idpanier) {
+		try {
+			$requete = "SELECT pp.*, p.nomproduit, p.categorie, p.image, p.description 
+						FROM panier_produit pp 
+						JOIN produit p ON pp.idproduit = p.idproduit 
+						WHERE pp.idpanier = :idpanier";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier));
+			return $exec->fetchAll();
+		} catch (PDOException $e) {
+			echo "Erreur lors de la récupération des produits du panier: " . $e->getMessage();
+			return array();
+		}
+	}
+
+	public function modifierQuantitePanier($idpanier, $idproduit, $quantite) {
+		try {
+			if ($quantite > 0) {
+				$requete = "UPDATE panier_produit SET quantite = :quantite 
+							WHERE idpanier = :idpanier AND idproduit = :idproduit";
+				$exec = $this->unPdo->prepare($requete);
+				$exec->execute(array(
+					':quantite' => $quantite,
+					':idpanier' => $idpanier,
+					':idproduit' => $idproduit
+				));
+				return array('success' => true, 'message' => 'Quantité modifiée');
+			} else {
+				return $this->supprimerProduitPanier($idpanier, $idproduit);
+			}
+		} catch (PDOException $e) {
+			return array('success' => false, 'message' => 'Erreur: ' . $e->getMessage());
+		}
+	}
+
+	public function supprimerProduitPanier($idpanier, $idproduit) {
+		try {
+			$requete = "DELETE FROM panier_produit WHERE idpanier = :idpanier AND idproduit = :idproduit";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier, ':idproduit' => $idproduit));
+			return array('success' => true, 'message' => 'Produit supprimé du panier');
+		} catch (PDOException $e) {
+			return array('success' => false, 'message' => 'Erreur: ' . $e->getMessage());
+		}
+	}
+
+	public function viderPanier($idpanier) {
+		try {
+			$requete = "DELETE FROM panier_produit WHERE idpanier = :idpanier";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier));
+			return array('success' => true, 'message' => 'Panier vidé avec succès');
+		} catch (PDOException $e) {
+			return array('success' => false, 'message' => 'Erreur: ' . $e->getMessage());
+		}
+	}
+
+	public function getTotalPanier($idpanier) {
+		try {
+			$requete = "SELECT SUM(quantite * prixUnitaire) as total FROM panier_produit WHERE idpanier = :idpanier";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier));
+			$result = $exec->fetch();
+			return $result['total'] ? $result['total'] : 0;
+		} catch (PDOException $e) {
+			echo "Erreur lors du calcul du total: " . $e->getMessage();
+			return 0;
+		}
+	}
+
+	public function getNombreArticlesPanier($idpanier) {
+		try {
+			$requete = "SELECT SUM(quantite) as nombre FROM panier_produit WHERE idpanier = :idpanier";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier));
+			$result = $exec->fetch();
+			return $result['nombre'] ? $result['nombre'] : 0;
+		} catch (PDOException $e) {
+			echo "Erreur lors du comptage des articles: " . $e->getMessage();
+			return 0;
+		}
+	}
+
+	public function validerPanier($idpanier, $idclient) {
+		try {
+			// Démarrer une transaction
+			$this->unPdo->beginTransaction();
+			
+			// Vérifier que le panier existe et appartient au client
+			$requete = "SELECT * FROM panier WHERE idpanier = :idpanier AND idclient = :idclient AND statut = 'actif'";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier, ':idclient' => $idclient));
+			$panier = $exec->fetch();
+			
+			if (!$panier) {
+				$this->unPdo->rollBack();
+				return array('success' => false, 'message' => 'Panier non trouvé ou déjà validé');
+			}
+			
+			// Vérifier que le panier contient des produits
+			$requete = "SELECT COUNT(*) as nbProduits FROM panier_produit WHERE idpanier = :idpanier";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier));
+			$nbProduits = $exec->fetch()['nbProduits'];
+			
+			if ($nbProduits == 0) {
+				$this->unPdo->rollBack();
+				return array('success' => false, 'message' => 'Le panier est vide');
+			}
+			
+			// Créer un devis
+			$dateDevis = date('Y-m-d');
+			$requete = "INSERT INTO devis (datedevis, etatdevis, idclient) VALUES (:datedevis, 'acceptee', :idclient)";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':datedevis' => $dateDevis, ':idclient' => $idclient));
+			$iddevis = $this->unPdo->lastInsertId();
+			
+			// Créer une commande
+			$requete = "INSERT INTO commande (etatcom, codedevis) VALUES ('en attente', :codedevis)";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':codedevis' => $iddevis));
+			$idcommande = $this->unPdo->lastInsertId();
+			
+			// Transférer les produits du panier vers la commande
+			$produits = $this->getProduitsPanier($idpanier);
+			foreach ($produits as $produit) {
+				$requete = "INSERT INTO ligne_com (idproduit, codecom, quantite) VALUES (:idproduit, :codecom, :quantite)";
+				$exec = $this->unPdo->prepare($requete);
+				$exec->execute(array(
+					':idproduit' => $produit['idproduit'],
+					':codecom' => $idcommande,
+					':quantite' => $produit['quantite']
+				));
+			}
+			
+			// Marquer le panier comme validé
+			$requete = "UPDATE panier SET statut = 'validé' WHERE idpanier = :idpanier";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idpanier' => $idpanier));
+			
+			// Valider la transaction
+			$this->unPdo->commit();
+			
+			return array(
+				'success' => true, 
+				'message' => 'Commande validée avec succès', 
+				'iddevis' => $iddevis, 
+				'idcommande' => $idcommande
+			);
+		} catch (PDOException $e) {
+			$this->unPdo->rollBack();
+			return array('success' => false, 'message' => 'Erreur lors de la validation: ' . $e->getMessage());
+		}
+	}
 }
 ?>

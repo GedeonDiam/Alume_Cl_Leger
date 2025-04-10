@@ -4,30 +4,30 @@
         <table>
             <tr>
                 <td> Nom du technicien : </td>
-                <td> <input type="text" name="nom" class="form-input" required></td>
+                <td> <input type="text" name="nom" class="form-input" required value="<?= ($leTechnicien==null)?' ':$leTechnicien['nom']?>"></td>
             </tr>
             <tr>
                 <td> Prénom du technicien : </td>
-                <td> <input type="text" name="prenom" class="form-input" required></td>
+                <td> <input type="text" name="prenom" class="form-input" required value="<?= ($leTechnicien==null)?' ':$leTechnicien['prenom']?>"></td>
             </tr>
             <tr>
                 <td> Spécialité : </td>
                 <td> 
                 <select name="specialite" class="form-select">
-                    <option value="" disabled selected hidden>Choisir une spécialité</option>
-                    <option value="services">Services</option>
-                    <option value="ateliers">Ateliers</option>
-                    <option value="autres">Autres</option>
+                    <option value="" disabled <?= ($leTechnicien==null)?'selected':''?> hidden>Choisir une spécialité</option>
+                    <option value="services" <?= ($leTechnicien!=null && $leTechnicien['specialite']=='services')?'selected':''?>>Services</option>
+                    <option value="ateliers" <?= ($leTechnicien!=null && $leTechnicien['specialite']=='ateliers')?'selected':''?>>Ateliers</option>
+                    <option value="autres" <?= ($leTechnicien!=null && $leTechnicien['specialite']=='autres')?'selected':''?>>Autres</option>
                 </select>
                 </td>
             </tr>
             <tr>
                 <td> Email technicien : </td>
-                <td> <input type="email" name="email" class="form-input" required></td>
+                <td> <input type="email" name="email" class="form-input" required value="<?= ($leTechnicien==null)?' ':$leTechnicien['email']?>"></td>
             </tr>
-            <tr>
+            <tr  style="display: none;">
                 <td> Mot de passe technicien : </td>
-                <td> <input type="password" name="mdp" class="form-input" required></td>
+                <td> <input type="password" name="mdp" class="form-input" required value="<?= ($leTechnicien==null)?' ':$leTechnicien['mdp']?>"></td>
             </tr>
             <tr>
                 <td> <input type="reset" name="Annuler" value="Annuler" class="btn btn-secondary"> </td>
@@ -36,7 +36,7 @@
                 'name="Modifier" value="Modifier"'?>
                 ></td>
             </tr>
-            <?= ($leTechnicien==null)?'':'<input type="hidden" name="idtech" value="'.$leTechnicien['idtechnicien'].'">'?>
+            <?= ($leTechnicien==null)?'':'<input type="hidden" name="idtechnicien" value="'.$leTechnicien['idtechnicien'].'">'?>
         </table>
     </form>
 </div>

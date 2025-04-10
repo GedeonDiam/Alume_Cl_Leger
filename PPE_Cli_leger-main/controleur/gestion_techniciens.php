@@ -35,10 +35,13 @@
 	if (isset($_POST["Modifier"])){
 		// Mise à jour des données dans la base
 		$unControleur->updateTechnicien($_POST);
-		echo "<br> Modification réussie";
-		// Redirection après modification pour actualiser la page
-		header("Location: index.php?page=3");
-		exit();  // Toujours faire un exit après une redirection
+		// Afficher un message de succès et rediriger après un délai
+		echo "<div id='message' style='color: green; font-weight: bold; padding: 10px; background-color: #f0fff0; border: 1px solid green; border-radius: 5px; margin: 10px 0;'>✅ Modification réussie ! Redirection dans 2 secondes...</div>";
+		echo "<script>
+			setTimeout(function() {
+				window.location.href = 'index.php?page=3';
+			}, 2000); // Redirection après 2 secondes
+		</script>";
 	}
 
 	//recuperation des clients de la base de données

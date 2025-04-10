@@ -31,18 +31,57 @@
                 
                 <!-- Conteneur d'authentification -->
                 <div class="auth-container">
+                    <?php if(isset($_SESSION['role']) && $_SESSION['role'] == 'client'): 
+                        // Récupération du panier actif et du nombre d'articles
+                        $idclient = $_SESSION['idclient'];
+                        $unPanier = $unControleur->getPanierActif($idclient);
+                        $nombreArticles = $unControleur->getNombreArticlesPanier($unPanier['idpanier']);
+                    ?>
+                        <a href="index.php?page=panier" class="btn btn-outline-warning me-2 position-relative">
+                            <i class="bi bi-cart3"></i>
+                            <?php if($nombreArticles > 0): ?>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    <?php echo $nombreArticles; ?>
+                                    <span class="visually-hidden">articles dans le panier</span>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    <?php endif; ?>
                 
                     <div class="btn-group">
                         <?php 
                         // Vérifie si l'utilisateur est connecté
-                        if(isset($_SESSION['unUser'])) { ?>
+                        if(isset($_SESSION['email'])) { ?>
 
                             <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle"></i> <?php echo $_SESSION['unUser']['nom']; ?>
+                                <i class="bi bi-person-circle"></i> 
+                                <?php 
+                                // Affichage personnalisé selon le rôle
+                                if(isset($_SESSION['role'])) {
+                                    // Récupération du nom à partir de unUser
+                                    $nomUtilisateur = '';
+                                    
+                                    if(isset($_SESSION['unUser']['nom'])) {
+                                        $nomUtilisateur = $_SESSION['unUser']['nom'];
+                                    } else {
+                                        $nomUtilisateur = $_SESSION['email']; // Utiliser l'email si le nom n'est pas disponible
+                                    }
+                                    
+                                    echo $nomUtilisateur ;
+                                } else {
+                                    echo $_SESSION['email'];
+                                }
+                                ?>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="index.php?page=profil">Profil</a></li>
-                                <li><a class="dropdown-item" href="index.php?page=10">Déconnexion</a></li>
+                                <li><a class="dropdown-item" href="index.php?page=profil">Mon profil</a></li>
+                                <?php if(isset($_SESSION['role']) && $_SESSION['role'] == 'client') { ?>
+                                    <li><a class="dropdown-item" href="index.php?page=mes_commandes">Mes commandes</a></li>
+                                <?php } ?>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="index.php?page=gestion_utilisateur&action=deconnexion">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                                </a></li>
                             </ul>
                         <?php } else { ?>
                             <!-- Affichage pour utilisateur non connecté -->
@@ -57,6 +96,9 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li class="ms-3"><i><b>Technicien</b></i></li>
                                 <li><a class="dropdown-item" href="index.php?page=inscription_technicien">Démarrer mon inscription</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="ms-3"><i><b>Administration</b></i></li>
+                                <li><a class="dropdown-item" href="index.php?page=connexion_admin">Accès administrateur</a></li>
                             </ul>
                         <?php } ?>
                     </div>
