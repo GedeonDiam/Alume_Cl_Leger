@@ -201,7 +201,10 @@ if (isset($_GET['page']) && $_GET['page'] == 10) {
             require_once("vue/partie_utilisateur/commande_confirmation.php");
             break;
     }
+
+    require_once("template/footer.php");
 ?>
+
 </center>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
