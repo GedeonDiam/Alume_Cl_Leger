@@ -463,6 +463,43 @@ class Modele {
         return $exec->fetch();
     }
 
+	public function getCommandesClient($idclient) {
+		try {
+			$requete = "SELECT c.idcommande, c.etatcom, c.codedevis, d.datedevis, 
+						SUM(lc.quantite) as nbArticles, 
+						SUM(lc.quantite * p.prix_unit) as montantTotal 
+						FROM commande c 
+						INNER JOIN devis d ON c.codedevis = d.iddevis 
+						INNER JOIN ligne_com lc ON c.idcommande = lc.codecom 
+						INNER JOIN produit p ON lc.idproduit = p.idproduit 
+						WHERE d.idclient = :idclient 
+						GROUP BY c.idcommande, c.etatcom, c.codedevis, d.datedevis
+						ORDER BY d.datedevis DESC";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idclient' => $idclient));
+			return $exec->fetchAll();
+		} catch (PDOException $e) {
+			echo "Erreur lors de la récupération des commandes: " . $e->getMessage();
+			return array();
+		}
+	}
+
+	public function getDetailsCommande($idcommande) {
+		try {
+			$requete = "SELECT lc.*, p.nomproduit, p.prix_unit, p.categorie, p.image, 
+						(lc.quantite * p.prix_unit) as sousTotal 
+						FROM ligne_com lc 
+						INNER JOIN produit p ON lc.idproduit = p.idproduit 
+						WHERE lc.codecom = :idcommande";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':idcommande' => $idcommande));
+			return $exec->fetchAll();
+		} catch (PDOException $e) {
+			echo "Erreur lors de la récupération des détails de commande: " . $e->getMessage();
+			return array();
+		}
+	}
+
 	/********************************Gestions des devis********************************************/
     public function insertDevis($tab){
         $requete = "insert into devis values (null, :datedevis, :etatdevis, :idclient);";

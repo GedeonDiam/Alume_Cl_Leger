@@ -13,7 +13,6 @@
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link" href="index.php?page=1">Accueil</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php?page=2">Client</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.php?page=3">Technicien</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php?page=4">Produits</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php?page=6">Commande</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php?page=7">Devis</a></li>

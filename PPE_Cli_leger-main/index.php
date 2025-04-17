@@ -57,7 +57,7 @@ if (isset($_GET['page']) && $_GET['page'] == 10) {
         }
         
         .navbar-brand, .nav-link {
-            color: #FFFD55 !important;
+            color:rgb(161, 159, 7) !important;
             transition: transform 0.2s;
         }
         
@@ -197,9 +197,13 @@ if (isset($_GET['page']) && $_GET['page'] == 10) {
             require_once("vue/partie_utilisateur/panier.php");
             break;
 
-        case 'commande_confirmation':
-            require_once("vue/partie_utilisateur/commande_confirmation.php");
+        case 'mes_commandes':
+            require_once("vue/partie_utilisateur/mes_commandes.php");
             break;
+
+            case 'profil':
+                require_once("vue/partie_utilisateur/profil.php");
+                break;
     }
 
     require_once("template/footer.php");

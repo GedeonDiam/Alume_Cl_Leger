@@ -175,6 +175,15 @@
 			return $this->unModele->selectWhereCommande($idcommande);
 		}
 
+		/****************** Gestion des commandes client ******/
+		public function getCommandesClient($idclient){
+			return $this->unModele->getCommandesClient($idclient);
+		}
+
+		public function getDetailsCommande($idcommande){
+			return $this->unModele->getDetailsCommande($idcommande);
+		}
+
 		/****************** Gestion des devis ******/
 		public function insertDevis($tab){
 			$this->unModele->insertDevis($tab);
