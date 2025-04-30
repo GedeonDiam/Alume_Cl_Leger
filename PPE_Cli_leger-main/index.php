@@ -201,6 +201,7 @@ if (isset($_GET['page']) && $_GET['page'] == 10) {
             require_once("vue/partie_utilisateur/mes_commandes.php");
             break;
 
+
             case 'profil':
                 require_once("vue/partie_utilisateur/profil.php");
                 break;
