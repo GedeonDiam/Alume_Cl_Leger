@@ -17,16 +17,19 @@ class Modele {
 	}
 	/**************** Gestion des clients ************/
 	public function insertClient($tab){
-		$requete = "insert into client values (null, :nom, :ville, :codepostal, :rue, :numrue, :email, :tel, :mdp);";
-		$donnees = array(':nom' => $tab['nom'],
-						 ':ville' => $tab['ville'],
-						 ':codepostal' => $tab['codepostal'],
-                         ':rue' => $tab['rue'],
-                         ':numrue' => $tab['numrue'],
-						 ':email' => $tab['email'],
-						 ':tel' => $tab['tel'],
-						 ':mdp' => $tab['mdp']
-						); 
+		$requete = "insert into client (nom, ville, codepostal, rue, numrue, email, tel, mdp, role) 
+					values (:nom, :ville, :codepostal, :rue, :numrue, :email, :tel, :mdp, :role);";
+		$donnees = array(
+			':nom' => $tab['nom'],
+			':ville' => $tab['ville'],
+			':codepostal' => $tab['codepostal'],
+			':rue' => $tab['rue'],
+			':numrue' => $tab['numrue'],
+			':email' => $tab['email'],
+			':tel' => $tab['tel'],
+			':mdp' => $tab['mdp'],
+			':role' => isset($tab['role']) ? $tab['role'] : 'client' // Valeur par défaut 'client'
+		); 
 		//on prépare la requete 
 		$exec = $this->unPdo->prepare ($requete);
 		//exécuter la requete 
