@@ -32,7 +32,7 @@ class Modele {
 		//exécuter la requete 
 		$exec->execute ($donnees);
 	}
- 
+
 
 	public function selectAllClients ($filtre){
 		if($filtre == ""){
@@ -850,7 +850,6 @@ class Modele {
 			
 			// Marquer le panier comme validé
 			$requete = "UPDATE panier SET statut = 'validé' WHERE idpanier = :idpanier";
-			$exec = $this->unPdo->prepare($requete);
 			$exec->execute(array(':idpanier' => $idpanier));
 			
 			// Valider la transaction
