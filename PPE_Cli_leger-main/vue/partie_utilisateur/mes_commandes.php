@@ -1,6 +1,7 @@
 <?php
 require_once("modele/modele.class.php");
 require_once("controleur/controleur.class.php");
+require_once("vue/composants/alert_popup.php"); // Inclure le composant de popup
 $unControleur = new Controleur();
 
 // Vérifier que l'utilisateur est connecté et est un client
@@ -26,11 +27,26 @@ $lesCommandes = $unControleur->getCommandesClient($idclient);
 if (isset($_GET['action']) && $_GET['action'] == 'supprimer' && isset($_GET['idcommande'])) {
     $idcommande = intval($_GET['idcommande']);
     $resultat = $unControleur->deleteCommande($idcommande);
+    
+    // Définir le message à afficher via une variable de session
+    $_SESSION['message'] = "Votre commande a bien été supprimée.";
+    $_SESSION['messageType'] = "success";
+    
     // Redirection pour éviter de retraiter la suppression lors d'un rafraîchissement
     echo '<script>
-    window.location.href = "index.php?page=mes_commandes&suppression=success";
-</script>';
-exit; 
+    window.location.href = "index.php?page=mes_commandes";
+    </script>';
+    exit; 
+}
+
+// Message après suppression réussie
+$message = '';
+$messageType = '';
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    $messageType = $_SESSION['messageType'];
+    unset($_SESSION['message']);
+    unset($_SESSION['messageType']);
 }
 
 // Récupération des détails d'une commande spécifique si demandé
@@ -108,12 +124,7 @@ function formatDate($date) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-        }
-        
+    <style>        
         .orders-header {
             background: linear-gradient(135deg, #080808 0%, #333333 100%);
             padding: 40px 0;
@@ -498,19 +509,8 @@ function formatDate($date) {
     </style>
 </head>
 <body>
-    <!-- Message de succès (s'affiche uniquement si suppression=success est dans l'URL) -->
-    <?php if(isset($_GET['suppression']) && $_GET['suppression'] == 'success'): ?>
-        <div class="success-message" id="success-notification">
-            <i class="fas fa-check-circle"></i>
-            <div class="success-message-content">
-                <h4>Suppression réussie !</h4>
-                <p>Votre commande a bien été supprimée.</p>
-            </div>
-            <button class="close-btn" onclick="document.getElementById('success-notification').style.display='none';">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    <?php endif; ?>
+    <!-- Utilisation du composant popup pour les messages -->
+    <?php if (!empty($message)) showAlertPopup($message, $messageType); ?>
 
     <div class="orders-header">
         <div class="container">
@@ -674,7 +674,6 @@ function formatDate($date) {
         <?php endif; ?>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Auto-fermeture du message de succès après 5 secondes
         setTimeout(function() {

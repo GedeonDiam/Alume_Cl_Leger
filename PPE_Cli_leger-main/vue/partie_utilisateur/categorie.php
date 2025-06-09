@@ -10,18 +10,11 @@ $categories = $unControleur->selectDistinctCategories();
 $categoriesPairs = array_chunk($categories, 2);
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nos Catégories - ALUME</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        body {
+        /* body {
             font-family: 'Poppins', sans-serif;
-        }
+        } */
         
         .hero-section {
             background: linear-gradient(135deg, #080808 0%, #333333 100%);
@@ -127,8 +120,8 @@ $categoriesPairs = array_chunk($categories, 2);
             transform: scale(1.05);
         }
     </style>
-</head>
-<body>
+
+<div>
     <!-- En-tête -->
     <div class="hero-section">
         <div class="container py-5">
@@ -209,6 +202,4 @@ $categoriesPairs = array_chunk($categories, 2);
         </section>
     </main>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>

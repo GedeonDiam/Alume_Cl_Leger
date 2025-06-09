@@ -35,7 +35,7 @@ class Modele {
 		//exécuter la requete 
 		$exec->execute ($donnees);
 	}
- 
+
 
 	public function selectAllClients ($filtre){
 		if($filtre == ""){
@@ -820,6 +820,7 @@ class Modele {
 			$exec = $this->unPdo->prepare($requete);
 			$exec->execute(array(':idpanier' => $idpanier));
 			$nbProduits = $exec->fetch()['nbProduits'];
+
 			
 			if ($nbProduits == 0) {
 				$this->unPdo->rollBack();
@@ -851,10 +852,11 @@ class Modele {
 				));
 			}
 			
-			// Marquer le panier comme validé
+			// // Marquer le panier comme validé
 			$requete = "UPDATE panier SET statut = 'validé' WHERE idpanier = :idpanier";
 			$exec = $this->unPdo->prepare($requete);
 			$exec->execute(array(':idpanier' => $idpanier));
+			
 			
 			// Valider la transaction
 			$this->unPdo->commit();
