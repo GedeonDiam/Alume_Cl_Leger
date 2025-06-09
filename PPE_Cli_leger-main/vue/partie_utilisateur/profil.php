@@ -12,6 +12,7 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['role'])) {
 
 require_once("modele/modele.class.php");
 require_once("controleur/controleur.class.php");
+require_once("vue/composants/alert_popup.php"); // Inclure le composant de popup
 $unControleur = new Controleur();
 
 // Récupération des informations de l'utilisateur selon son rôle
@@ -116,11 +117,7 @@ if ($userType == 'client') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-        }
-        
+
         .page-header {
             background: linear-gradient(135deg, #080808 0%, #333333 100%);
             padding: 50px 0;
@@ -354,13 +351,8 @@ if ($userType == 'client') {
     </div>
     
     <div class="container mb-5">
-        <!-- Messages de notification -->
-        <?php if (!empty($message)): ?>
-            <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show" role="alert">
-                <?php echo $message; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        <?php endif; ?>
+        <!-- Utilisation du composant popup pour les messages -->
+        <?php if (!empty($message)) showAlertPopup($message, $messageType); ?>
         
         <div class="profile-container">
             <div class="profile-header">
@@ -643,15 +635,6 @@ if ($userType == 'client') {
                 this.style.borderColor = '#dc3545';
             }
         });
-        
-        // Auto-hide des messages d'alerte après 5 secondes
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
     </script>
 </body>
 </html>
