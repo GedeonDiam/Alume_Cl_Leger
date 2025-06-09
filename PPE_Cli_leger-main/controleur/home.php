@@ -4,7 +4,7 @@
     <div class="container py-5">
         <div class="row align-items-center">
             <div class="col-lg-6" data-aos="fade-right">
-                <h1 class="display-4 text-light fw-bold">Bienvenue chez <span class="text-warning">Alume</span></h1>
+                <h1 class="display-4 text-light fw-bold">Bienvenue chez <span class="text-warning">Gedeon</span></h1>
                 <p class="lead text-light mb-4">Site ALU-ME pour la gestion des projets d'équipement d'éclairage innovants et durables</p>
             </div>
             <div class="col-lg-6" data-aos="fade-left">
