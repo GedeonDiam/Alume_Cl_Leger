@@ -16,7 +16,6 @@
                     <li class="nav-item"><a class="nav-link" href="index.php?page=4">Produits</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php?page=6">Commande</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.php?page=7">Devis</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.php?page=9">Intervention</a></li>
                 </ul>
             </div>
 

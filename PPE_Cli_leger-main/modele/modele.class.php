@@ -142,11 +142,13 @@ class Modele {
 
 		/**************** Gestion des produits ************/
 	public function insertProduit($tab){
-		$requete = "insert into produit values (null, :nomproduit, :prix_unit, :categorie);";
+		$requete = "insert into produit values (null, :nomproduit, :prix_unit, :categorie, :image, :description);";
 		$donnees = array(
 			':nomproduit' => $tab['nomproduit'],
 			':prix_unit' => $tab['prix_unit'],
-			':categorie' => $tab['categorie']  
+			':categorie' => $tab['categorie'],
+			':image' => isset($tab['image']) ? $tab['image'] : 'default_product.jpg',
+			':description' => isset($tab['description']) ? $tab['description'] : ''
 		); 
 		$exec = $this->unPdo->prepare($requete);
 		$exec->execute($donnees);
@@ -278,23 +280,7 @@ class Modele {
 
 	public function verifConnexion($email, $mdp){
 		try {
-			// Vérification dans la table technicien
-			$requete = "select * from technicien where email =:email and mdp=:mdp;";
-			$exec = $this->unPdo->prepare($requete);
-			$donnees = array(":email"=>$email, ":mdp"=>$mdp);
-			$exec->execute($donnees);
-			$resultat = $exec->fetch();
 			
-			if($resultat) {
-				return array(
-					"success" => true,
-					"message" => "Connexion technicien réussie !",
-					"data" => $resultat,
-					"role" => $resultat['role'] ? $resultat['role'] : 'technicien'
-				);
-			} 
-			
-			// Si pas de technicien trouvé, vérification dans la table client
 			$requete = "select * from client where email = :email and mdp = :mdp;";
 			$donnees = array(':email' => $email, ':mdp' => $mdp);
 			$exec = $this->unPdo->prepare($requete);

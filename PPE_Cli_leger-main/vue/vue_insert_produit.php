@@ -1,6 +1,6 @@
 <div class="container">
     <h3>Ajout d'un produit</h3>
-    <form method="post" class="form-technicien">
+    <form method="post" class="form-technicien" enctype="multipart/form-data">
         <table>
             <tr>
                 <td>Nom du produit : </td>
@@ -15,6 +15,25 @@
             <tr>
                 <td>Catégorie : </td>
                 <td><input type="text" name="categorie" class="form-input" required value="<?= ($leProduit==null)?' ':$leProduit['categorie']?>"></td>
+            </tr>
+
+            <tr>
+                <td>Image : </td>
+                <td>
+                    <input type="text" name="image" class="form-input" placeholder="Nom du fichier image" value="<?= ($leProduit==null)?' ':$leProduit['image']?>">
+                    <?php if($leProduit != null && !empty($leProduit['image']) && $leProduit['image'] != 'default_product.jpg'): ?>
+                        <div class="image-preview">
+                            <img src="images/produits/<?= $leProduit['image'] ?>" alt="Aperçu du produit" height="100">
+                        </div>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Description : </td>
+                <td>
+                    <textarea name="description" class="form-input form-textarea" rows="4"><?= ($leProduit==null)?' ':$leProduit['description']?></textarea>
+                </td>
             </tr>
 
             <tr>
@@ -66,7 +85,13 @@
         font-size: 14px;
     }
 
-    .form-input:focus {
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+    }
+
+    .form-input:focus, .form-textarea:focus {
         outline: none;
         border-color: #FFD700;
         box-shadow: 0 0 5px rgba(255,215,0,0.3);
@@ -98,11 +123,18 @@
         transform: translateY(-1px);
     }
 
-    .form-input:hover {
+    .form-input:hover, .form-textarea:hover {
         border-color: #FFD700;
     }
 
     .form-input:required {
         border-left: 4px solid #FFD700;
+    }
+
+    .image-preview {
+        margin-top: 8px;
+        padding: 5px;
+        border: 1px dashed #ccc;
+        display: inline-block;
     }
 </style>
