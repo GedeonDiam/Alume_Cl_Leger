@@ -16,7 +16,100 @@ class Modele {
 		}
 	}
 	/**************** Gestion des clients ************/
+	public function validatePassword($password) {
+		$errors = [];
+
+		// Vérifier la longueur minimale (8 caractères)
+		if (strlen($password) < 8) {
+			$errors[] = "Le mot de passe doit contenir au moins 8 caractères";
+		}
+
+		// Vérifier la présence d'au moins une lettre majuscule
+		if (!preg_match('/[A-Z]/', $password)) {
+			$errors[] = "Le mot de passe doit contenir au moins une lettre majuscule";
+		}
+
+		// Vérifier la présence d'au moins une lettre minuscule
+		if (!preg_match('/[a-z]/', $password)) {
+			$errors[] = "Le mot de passe doit contenir au moins une lettre minuscule";
+		}
+
+		// Vérifier la présence d'au moins un chiffre
+		if (!preg_match('/[0-9]/', $password)) {
+			$errors[] = "Le mot de passe doit contenir au moins un chiffre";
+		}
+
+		// Vérifier la présence d'au moins un caractère spécial
+		if (!preg_match('/[^A-Za-z0-9]/', $password)) {
+			$errors[] = "Le mot de passe doit contenir au moins un caractère spécial";
+		}
+
+		return [
+			'valid' => count($errors) === 0,
+			'errors' => $errors
+		];
+	}
+
+	public function emailExists($email) {
+		try {
+			// Vérifier si l'email existe déjà dans la table client
+			$requete = "SELECT COUNT(*) as count FROM client WHERE email = :email";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':email' => $email));
+			$resultat = $exec->fetch();
+			
+			if ($resultat['count'] > 0) {
+				return true;
+			}
+			
+			// Vérifier si l'email existe déjà dans la table technicien
+			$requete = "SELECT COUNT(*) as count FROM technicien WHERE email = :email";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':email' => $email));
+			$resultat = $exec->fetch();
+			
+			if ($resultat['count'] > 0) {
+				return true;
+			}
+			
+			// Vérifier si l'email existe déjà dans la table administrateur
+			$requete = "SELECT COUNT(*) as count FROM administrateur WHERE email = :email";
+			$exec = $this->unPdo->prepare($requete);
+			$exec->execute(array(':email' => $email));
+			$resultat = $exec->fetch();
+			
+			return $resultat['count'] > 0;
+		} catch(PDOException $e) {
+			return false;
+		}
+	}
+
 	public function insertClient($tab){
+		// Vérifier si l'email existe déjà
+		if ($this->emailExists($tab['email'])) {
+			return [
+				'success' => false,
+				'message' => 'Cet email est déjà utilisé',
+				'errors' => ['L\'adresse email ' . $tab['email'] . ' est déjà associée à un compte']
+			];
+		}
+
+		// Validation du mot de passe
+		$validation = $this->validatePassword($tab['mdp']);
+		if (!$validation['valid']) {
+			return [
+				'success' => false,
+				'message' => 'Le mot de passe ne respecte pas les règles de sécurité',
+				'errors' => $validation['errors']
+			];
+		}
+
+		// Stocker le mot de passe en clair pour la connexion automatique
+		$mdp_clair = $tab['mdp'];
+
+		// Hasher le mot de passe avant l'insertion dans la base de données
+		$tab['mdp'] = password_hash($tab['mdp'], PASSWORD_DEFAULT);
+
 		$requete = "insert into client (nom, ville, codepostal, rue, numrue, email, tel, mdp, role) 
 					values (:nom, :ville, :codepostal, :rue, :numrue, :email, :tel, :mdp, :role);";
 		$donnees = array(
@@ -30,10 +123,33 @@ class Modele {
 			':mdp' => $tab['mdp'],
 			':role' => isset($tab['role']) ? $tab['role'] : 'client' // Valeur par défaut 'client'
 		); 
-		//on prépare la requete 
-		$exec = $this->unPdo->prepare ($requete);
-		//exécuter la requete 
-		$exec->execute ($donnees);
+
+		try {
+			//on prépare la requete 
+			$exec = $this->unPdo->prepare($requete);
+			//exécuter la requete 
+			$exec->execute($donnees);
+			return [
+				'success' => true,
+				'message' => 'Inscription réussie',
+				'mdp_clair' => $mdp_clair // Renvoyer le mot de passe en clair pour la connexion automatique
+			];
+		} catch(PDOException $e) {
+			// Capturer et analyser spécifiquement l'erreur de duplicate entry
+			if ($e->getCode() == 23000 && strpos($e->getMessage(), 'Duplicata') !== false) {
+				return [
+					'success' => false,
+					'message' => 'Cet email est déjà utilisé',
+					'errors' => ['L\'adresse email ' . $tab['email'] . ' est déjà associée à un compte']
+				];
+			}
+			
+			return [
+				'success' => false,
+				'message' => 'Erreur lors de l\'inscription',
+				'errors' => [$e->getMessage()]
+			];
+		}
 	}
  
 
@@ -58,6 +174,11 @@ class Modele {
 		$exec->execute($donnees);
 	}
 	public function updateClient($tab){
+		// Si un nouveau mot de passe est fourni, le hasher
+        if(isset($tab['mdp']) && !empty($tab['mdp'])) {
+            $tab['mdp'] = password_hash($tab['mdp'], PASSWORD_DEFAULT);
+        }
+
 		$requete = "update client set nom = :nom, ville = :ville, codepostal = :codepostal, rue = :rue, numrue = :numrue, email = :email, mdp = :mdp, tel = :tel where idclient = :idclient;";
 		$donnees = array (':idclient' => $tab['idclient'],
 						':nom' => $tab['nom'],
@@ -83,6 +204,9 @@ class Modele {
 
 	/**************** Gestion des techniciens ************/
 	public function insertTechnicien($tab){
+        // Hasher le mot de passe
+        $tab['mdp'] = password_hash($tab['mdp'], PASSWORD_DEFAULT);
+        
 		$requete = "insert into technicien values (null, :nom, :prenom, :specialite, :email, :mdp);";
 		$donnees = array(':nom' => $tab['nom'],
 						':prenom' => $tab['prenom'],
@@ -119,6 +243,11 @@ class Modele {
 		$exec->execute($donnees);
 		}
 		public function updateTechnicien($tab){
+        // Si un nouveau mot de passe est fourni, le hasher
+        if(isset($tab['mdp']) && !empty($tab['mdp'])) {
+            $tab['mdp'] = password_hash($tab['mdp'], PASSWORD_DEFAULT);
+        }
+
 		$requete = "update technicien set nom = :nom, prenom = :prenom, specialite = :specialite, email = :email, mdp = :mdp where idtechnicien = :idtechnicien;";
 		$donnees = array (
 			':idtechnicien' => $tab['idtechnicien'],
@@ -278,30 +407,29 @@ class Modele {
 
 	public function verifConnexion($email, $mdp){
 		try {
-			// Vérification dans la table technicien
-			$requete = "select * from technicien where email =:email and mdp=:mdp;";
+			// Vérification dans la table client
+			$requete = "select * from client where email = :email;";
 			$exec = $this->unPdo->prepare($requete);
-			$donnees = array(":email"=>$email, ":mdp"=>$mdp);
+			$donnees = array(":email" => $email);
 			$exec->execute($donnees);
 			$resultat = $exec->fetch();
-			
-			if($resultat) {
+			if($resultat && password_verify($mdp, $resultat['mdp'])) {
 				return array(
 					"success" => true,
-					"message" => "Connexion technicien réussie !",
+					"message" => "Connexion client réussie !",
 					"data" => $resultat,
 					"role" => $resultat['role'] ? $resultat['role'] : 'technicien'
 				);
 			} 
 			
-			// Si pas de technicien trouvé, vérification dans la table client
-			$requete = "select * from client where email = :email and mdp = :mdp;";
-			$donnees = array(':email' => $email, ':mdp' => $mdp);
+			// Si pas de technicien trouvé ou mot de passe incorrect, vérification dans la table client
+			$requete = "select * from client where email = :email;";
+			$donnees = array(':email' => $email);
 			$exec = $this->unPdo->prepare($requete);
 			$exec->execute($donnees);
 			$resultat = $exec->fetch();
 			
-			if($resultat) {
+			if($resultat && password_verify($mdp, $resultat['mdp'])) {
 				return array(
 					"success" => true,
 					"message" => "Connexion client réussie !",
@@ -324,13 +452,13 @@ class Modele {
 	
 	public function verifConnexionClient($email, $mdp){
 		try {
-			$requete = "select * from client where email = :email and mdp = :mdp;";
-			$donnees = array(':email' => $email, ':mdp' => $mdp);
+			$requete = "select * from client where email = :email;";
+			$donnees = array(':email' => $email);
 			$exec = $this->unPdo->prepare($requete);
 			$exec->execute($donnees);
 			$resultat = $exec->fetch();
 			
-			if($resultat) {
+			if($resultat && password_verify($mdp, $resultat['mdp'])) {
 				return array(
 					"success" => true,
 					"message" => "Connexion client réussie !",
@@ -565,6 +693,9 @@ class Modele {
 
 	/********************************Gestions des administrateurs********************************************/
     public function insertAdmin($tab){
+        // Hasher le mot de passe
+        $tab['mdp'] = password_hash($tab['mdp'], PASSWORD_DEFAULT);
+        
         $requete = "insert into administrateur values (null, :nom, :prenom, :email, :mdp);";
         $donnees = array(
             ':nom' => $tab['nom'],
@@ -598,6 +729,11 @@ class Modele {
     }
 
     public function updateAdmin($tab){
+        // Si un nouveau mot de passe est fourni, le hasher
+        if(isset($tab['mdp']) && !empty($tab['mdp'])) {
+            $tab['mdp'] = password_hash($tab['mdp'], PASSWORD_DEFAULT);
+        }
+
         $requete = "update administrateur set nom = :nom, prenom = :prenom, email = :email, mdp = :mdp where idadmin = :idadmin;";
         $donnees = array(
             ':idadmin' => $tab['idadmin'],
@@ -619,18 +755,22 @@ class Modele {
     }
 
     public function verifConnexionAdmin($email, $mdp) {
-		try {
-			$requete = "select * from administrateur where email = :email and mdp = :mdp;";
-			$donnees = array(':email' => $email, ':mdp' => $mdp);
-			$exec = $this->unPdo->prepare($requete);
-			$exec->execute($donnees);
-			$resultat = $exec->fetch();
-			return $resultat;  // Retourne false si aucun administrateur trouvé
-		} catch(PDOException $e) {
-			echo "Erreur de connexion admin : " . $e->getMessage();
-			return false;
-		}
-	}
+        try {
+            $requete = "select * from administrateur where email = :email;";
+            $donnees = array(':email' => $email);
+            $exec = $this->unPdo->prepare($requete);
+            $exec->execute($donnees);
+            $resultat = $exec->fetch();
+            
+            if($resultat && password_verify($mdp, $resultat['mdp'])) {
+                return $resultat;  // Retourne le résultat si authentification réussie
+            }
+            return false;  // Retourne false si aucun administrateur trouvé ou mdp incorrect
+        } catch(PDOException $e) {
+            echo "Erreur de connexion admin : " . $e->getMessage();
+            return false;
+        }
+    }
 
     public function deconnexion() {
         session_start();

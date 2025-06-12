@@ -161,6 +161,10 @@ if (isset($_GET['page']) && $_GET['page'] == 10) {
             require_once("vue/vue_connexion.php");
             break;
 
+        case 'inscription':
+            require_once("vue/partie_utilisateur/vue_inscription_client.php");
+            break;
+
         case 'connexion_admin':
             require_once("vue/vue_connexion_admin.php");
             break;

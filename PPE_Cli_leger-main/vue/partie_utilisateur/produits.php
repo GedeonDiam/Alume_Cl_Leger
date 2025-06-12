@@ -49,32 +49,14 @@ if (isset($_GET['categorie']) && !empty($_GET['categorie'])) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nos Produits - ALUME</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+ <style>
+       
 
-        body {
-            background: #f5f5f5;
-        }
-
-        .container {
+        /* .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
-        }
+        } */
 
         .header {
             text-align: center;
@@ -280,8 +262,8 @@ if (isset($_GET['categorie']) && !empty($_GET['categorie'])) {
             margin-top: 15px;
         }
     </style>
-</head>
-<body>
+
+<div>
     <div class="header">
         <h1>Notre Collection de Produits</h1>
         <p>Découvrez nos produits de qualité pour tous vos projets</p>
@@ -360,8 +342,6 @@ if (isset($_GET['categorie']) && !empty($_GET['categorie'])) {
         </div>
     </div>
 
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Auto-hide alerts after 5 seconds
         setTimeout(function() {
@@ -372,5 +352,5 @@ if (isset($_GET['categorie']) && !empty($_GET['categorie'])) {
             });
         }, 5000);
     </script>
-</body>
-</html>
+</div>
+

@@ -14,6 +14,12 @@
                                 <?= $message ?>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
+                        <?php elseif(isset($_GET['inscription']) && $_GET['inscription'] == 'success'): ?>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                Inscription réussie ! Vous pouvez maintenant vous connecter.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                         <?php endif; ?>
                         
                         <form method="post" action="index.php?page=gestion_utilisateur">
@@ -37,6 +43,9 @@
                                 <button type="reset" name="Annuler" class="btn btn-secondary">
                                     <i class="bi bi-x-circle me-2"></i>Annuler
                                 </button>
+                                <a href="index.php?page=inscription" class="btn btn-link">
+                                    <i class="bi bi-person-plus me-1"></i>Pas encore inscrit ? Créer un compte
+                                </a>
                             </div>
                         </form>
                     </div>

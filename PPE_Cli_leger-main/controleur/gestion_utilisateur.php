@@ -6,7 +6,6 @@ if (isset($_POST["Connexion"])){
     
     // Vérification des identifiants
     $resultat = $unControleur->verifConnexion($email, $mdp);
-    
     if ($resultat && $resultat['success']) {
         // Si la connexion est réussie
         $_SESSION['email'] = $email;

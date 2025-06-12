@@ -93,9 +93,9 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li class="ms-3"><i><b>Client</b></i></li>
                                 <li><a class="dropdown-item" href="index.php?page=inscription_client">Démarrer mon inscription</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <!-- <li><hr class="dropdown-divider"></li>
                                 <li class="ms-3"><i><b>Administration</b></i></li>
-                                <li><a class="dropdown-item" href="index.php?page=connexion_admin">Accès administrateur</a></li>
+                                <li><a class="dropdown-item" href="index.php?page=connexion_admin">Accès administrateur</a></li> -->
                             </ul>
                         <?php } ?>
                     </div>

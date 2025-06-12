@@ -32,32 +32,8 @@ if (isset($_POST['submit_contact'])) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contactez-nous - ALUME</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: #f5f5f5;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+<style>
+       
 
         .header {
             text-align: center;
@@ -242,8 +218,8 @@ if (isset($_POST['submit_contact'])) {
             border: none;
         }
     </style>
-</head>
-<body>
+
+<div>
     <div class="header">
         <h1>Contactez-nous</h1>
         <p>Nous sommes à votre écoute pour toutes vos questions</p>
@@ -340,9 +316,7 @@ if (isset($_POST['submit_contact'])) {
         </div>
     </div>
 
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+     <script>
         // Auto-hide alerts after 5 seconds
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
@@ -352,5 +326,5 @@ if (isset($_POST['submit_contact'])) {
             });
         }, 5000);
     </script>
-</body>
-</html>
+</div>
+
